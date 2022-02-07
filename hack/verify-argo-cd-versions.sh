@@ -14,13 +14,3 @@ if [[ $VERSION_FROM_CI_BUILD != *"$TARGET_ARGO_CD_VERSION"* ]]; then
     echo "- Found: $VERSION_FROM_CI_BUILD"
     exit 1
 fi
-
-# Extract the argoproj/argo-cd GitHub resource URL, which SHOULD contain the target version
-# VERSION_FROM_KUSTOMIZATION_YAML=$( cat manifests/namespace-install-with-argo-cd/kustomization.yaml | grep "argoproj/argo-cd" )
-
-#if [[ $VERSION_FROM_KUSTOMIZATION_YAML != *"$TARGET_ARGO_CD_VERSION"* ]]; then
-#    echo
-#    echo "ERROR: 'manifests/namespace-install-with-argo-cd/kustomization.yaml' does not target the expected Argo CD version: $TARGET_ARGO_CD_VERSION"
-#    echo "- Found: $VERSION_FROM_KUSTOMIZATION_YAML"
-#    exit 1
-#fi
