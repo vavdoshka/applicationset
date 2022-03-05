@@ -23,7 +23,7 @@ spec:
         path: examples/untyped-template/git-file/apps
 
         # USECASE - NON_PRIMITIVE TEMPLATING (https://github.com/argoproj/applicationset/issues/168#issue-840093112)
-        {{ toYaml (fromJson .plugin) | nindent 4 }} 
+        {{ .extra | nindent 4 }} 
 
         
       destination:
