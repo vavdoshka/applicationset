@@ -20,13 +20,36 @@ import (
 )
 
 type Renderer interface {
-	RenderTemplateParams(tmpl *argov1alpha1.Application, syncPolicy *argoprojiov1alpha1.ApplicationSetSyncPolicy, templateOptions *argoprojiov1alpha1.ApplicationSetTemplateOptions, params map[string]string) (*argov1alpha1.Application, error)
+	RenderTemplateParams(tmpl *argov1alpha1.Application, syncPolicy *argoprojiov1alpha1.ApplicationSetSyncPolicy, fullyUntypedTemplate argoprojiov1alpha1.ApplicationSetFullyUntypedTemplate, params map[string]string) (*argov1alpha1.Application, error)
 }
 
 type Render struct {
 }
 
-func (r *Render) RenderTemplateParams(tmpl *argov1alpha1.Application, syncPolicy *argoprojiov1alpha1.ApplicationSetSyncPolicy, templateOptions *argoprojiov1alpha1.ApplicationSetTemplateOptions, params map[string]string) (*argov1alpha1.Application, error) {
+func ToYaml(v interface{}) (string, error) {
+	data, err := yaml.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+func createFuncMap() template.FuncMap {
+	funcMap := sprig.TxtFuncMap()
+
+	extraFuncMap := template.FuncMap{
+		"toYaml":           ToYaml,
+	}
+
+	for name, f := range extraFuncMap {
+		funcMap[name] = f
+	}
+
+
+	return funcMap
+}
+
+func (r *Render) RenderTemplateParams(tmpl *argov1alpha1.Application, syncPolicy *argoprojiov1alpha1.ApplicationSetSyncPolicy, fullyUntypedTemplate argoprojiov1alpha1.ApplicationSetFullyUntypedTemplate, params map[string]string) (*argov1alpha1.Application, error) {
 	if tmpl == nil {
 		return nil, fmt.Errorf("application template is empty ")
 	}
@@ -38,7 +61,7 @@ func (r *Render) RenderTemplateParams(tmpl *argov1alpha1.Application, syncPolicy
 	var replacedTmpl argov1alpha1.Application
 	var replacedTmplStr string
 
-	if templateOptions == nil || !templateOptions.GotemplateEnabled {
+	if fullyUntypedTemplate == "" {
 		tmplBytes, err := json.Marshal(tmpl)
 		if err != nil {
 			return nil, err
@@ -56,14 +79,8 @@ func (r *Render) RenderTemplateParams(tmpl *argov1alpha1.Application, syncPolicy
 		}
 	} else {
 
-		// as opposed to json, yaml escapes double quote sign with only one slash and hence allow to use {{ "string" }} scalar variables for various use-cases
-		tmplBytes, err := yaml.Marshal(tmpl)
-		if err != nil {
-			return nil, err
-		}
-
 		// missingkey=zero - replace unmatched variables with ""
-		goTemplate, err := template.New("argocd-app").Option("missingkey=zero").Funcs(sprig.TxtFuncMap()).Parse(string(tmplBytes))
+		goTemplate, err := template.New("").Option("missingkey=zero").Funcs(createFuncMap()).Parse(string(fullyUntypedTemplate))
 		if err != nil {
 			return nil, err
 		}

@@ -1,0 +1,6 @@
+cluster: engineering-dev
+url: https://kubernetes.default.svc
+autosyncEnabled: "true"
+autosyncSelfHeal: "true"
+namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
+plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"

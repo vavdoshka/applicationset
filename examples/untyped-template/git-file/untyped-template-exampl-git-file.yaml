@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: dynamic-template
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/vavdoshka/applicationset.git
+        revision: feat/NONCOMPLIANT/name
+        files:
+        - path: "examples/untyped-template/git-file/apps/*.yaml"
+  fullyUntypedTemplate: |
+    metadata:
+      name: '{{ .cluster }}-guestbook' # decide how to structure this, with guestbook or how
+    spec:
+
+      # USECASE - DEFAULT VALUE
+      project: '{{ default "default" .project }}'
+
+      source:
+        repoURL: https://github.com/argoproj/applicationset.git
+        targetRevision: HEAD
+        path: examples/untypedTemplate
+
+        # USECASE - NON_PRIMITIVE TEMPLATING (https://github.com/argoproj/applicationset/issues/168#issue-840093112)
+        {{ toYaml (fromJson .plugin) | nindent 4 }} 
+
+        
+      destination:
+        server: '{{ .url }}'
+
+        # USECASE - TEXT FORMATTING
+        namespace: {{ trunc 63 (.namespace | replace "/" "-" | lower) }}
+
+      # USECASE - CONTROLLING SYNC POLICY CREATION
+      {{ if (eq .autosyncEnabled "true") }}
+      syncPolicy:
+        automated:
+          # USECASE - NON-STRING PRIMITIVE TEMPLATING
+          selfHeal: {{ eq .autosyncSelfHeal "true" }}
+      {{ end }}

@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: dynamic-template
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: engineering-dev
+        url: https://kubernetes.default.svc
+        autosyncEnabled: "true"
+        autosyncSelfHeal: "true"
+        namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
+        plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
+      - cluster: engineering-prod
+        url: https://kubernetes.default.svc
+        autosyncEnabled: "false"
+        project: default
+        namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
+        plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
+  fullyUntypedTemplate: |
+    metadata:
+      name: '{{ .cluster }}-guestbook' # decide how to structure this, with guestbook or how
+    spec:
+
+      # USECASE - DEFAULT VALUE
+      project: '{{ default "default" .project }}'
+
+      source:
+        repoURL: https://github.com/argoproj/applicationset.git
+        targetRevision: HEAD
+        path: examples/untypedTemplate
+
+        # USECASE - NON_PRIMITIVE TEMPLATING (https://github.com/argoproj/applicationset/issues/168#issue-840093112)
+        {{ toYaml (fromJson .plugin) | nindent 4 }} 
+
+        
+      destination:
+        server: '{{ .url }}'
+
+        # USECASE - TEXT FORMATTING
+        namespace: {{ trunc 63 (.namespace | replace "/" "-" | lower) }}
+
+      # USECASE - CONTROLLING SYNC POLICY CREATION
+      {{ if (eq .autosyncEnabled "true") }}
+      syncPolicy:
+        automated:
+          # USECASE - NON-STRING PRIMITIVE TEMPLATING
+          selfHeal: {{ eq .autosyncSelfHeal "true" }}
+      {{ end }}

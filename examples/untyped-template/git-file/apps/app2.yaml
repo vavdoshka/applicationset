@@ -1,0 +1,6 @@
+cluster: engineering-prod
+url: https://kubernetes.default.svc
+autosyncEnabled: "false"
+project: default
+namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
+plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"

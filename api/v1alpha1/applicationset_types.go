@@ -48,10 +48,10 @@ type ApplicationSet struct {
 
 // ApplicationSetSpec represents a class of application set state.
 type ApplicationSetSpec struct {
-	Generators      []ApplicationSetGenerator      `json:"generators"`
-	Template        ApplicationSetTemplate         `json:"template"`
-	SyncPolicy      *ApplicationSetSyncPolicy      `json:"syncPolicy,omitempty"`
-	TemplateOptions *ApplicationSetTemplateOptions `json:"templateOptions,omitempty"`
+	Generators           []ApplicationSetGenerator          `json:"generators"`
+	Template             ApplicationSetTemplate             `json:"template,omitempty"`
+	SyncPolicy           *ApplicationSetSyncPolicy          `json:"syncPolicy,omitempty"`
+	FullyUntypedTemplate ApplicationSetFullyUntypedTemplate `json:"fullyUntypedTemplate,omitempty"`
 }
 
 // ApplicationSetSyncPolicy configures how generated Applications will relate to their
@@ -60,6 +60,8 @@ type ApplicationSetSyncPolicy struct {
 	// PreserveResourcesOnDeletion will preserve resources on deletion. If PreserveResourcesOnDeletion is set to true, these Applications will not be deleted.
 	PreserveResourcesOnDeletion bool `json:"preserveResourcesOnDeletion,omitempty"`
 }
+
+type ApplicationSetFullyUntypedTemplate string
 
 // ApplicationSetTemplateOptions configures how template rendering behaves
 type ApplicationSetTemplateOptions struct {
