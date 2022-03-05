@@ -6,7 +6,7 @@ spec:
   generators:
     - git:
         repoURL: https://github.com/vavdoshka/applicationset.git
-        revision: feat/NONCOMPLIANT/name
+        revision: testing-templating
         files:
         - path: "examples/untyped-template/git-file/apps/*.yaml"
   fullyUntypedTemplate: |

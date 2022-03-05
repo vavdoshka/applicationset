@@ -1,8 +1,32 @@
-cluster: engineering-dev
-url: https://kubernetes.default.svc
-autosyncEnabled: "true"
-autosyncSelfHeal: "true"
-namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
-plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
-appAnnotations:
-  annotation1: value1
+"metadata:
+  name: 'engineering-prod-guestbook' # decide how to structure this, with guestbook or how
+spec:
+
+
+  revisionHistoryLimit: 0
+
+  # USECASE - DEFAULT VALUE
+  project: 'default'
+
+  source:
+    repoURL: https://github.com/argoproj/applicationset.git
+    targetRevision: HEAD
+    # this does allow to create some arbitarary segment
+    # with quotes '{ .test }' it is becomming an invalid data all wrapped with redundant quotes
+    path: 'some-value'
+    fieldDoesNotExist: 'val'
+
+    # USECASE - NON_PRIMITIVE TEMPLATING (https://github.com/argoproj/applicationset/issues/168#issue-840093112)
+    
+    plugin:
+      name: kustomized-helm
+     
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    # USECASE - TEXT FORMATTING
+    namespace: some------really---loooooooooooooooooooooooooooooooong--namespa
+
+  # USECASE - CONTROLLING SYNC POLICY CREATION
+  
+"

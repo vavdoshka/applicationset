@@ -11,7 +11,7 @@ spec:
         autosyncEnabled: "true"
         autosyncSelfHeal: "true"
         namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
-        plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
+        sourceRendererConf: "{\"helm\": {\"values\":  \"{\\\"standardHelm\\\": true }\" } }"
         test: "'some-value'\n    chart: 'some-other-chart'"
         revisionHistoryLimit: "0"
       - cluster: engineering-prod
@@ -19,13 +19,14 @@ spec:
         autosyncEnabled: "false"
         project: default
         namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
-        plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
-        test: "'some-value'\n    chart: 'some-other-chart'"
+        sourceRendererConf: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
+        test: "'some-value'\n    fieldDoesNotExist: 'val'"
         revisionHistoryLimit: "0"
   fullyUntypedTemplate: |
     metadata:
       name: '{{ .cluster }}-guestbook' # decide how to structure this, with guestbook or how
     spec:
+
 
       revisionHistoryLimit: {{ atoi .revisionHistoryLimit }}
 
@@ -37,16 +38,13 @@ spec:
         targetRevision: HEAD
         # this does allow to create some arbitarary segment
         # with quotes '{ .test }' it is becomming an invalid data all wrapped with redundant quotes
-
         path: {{ .test }}
 
         # USECASE - NON_PRIMITIVE TEMPLATING (https://github.com/argoproj/applicationset/issues/168#issue-840093112)
-        {{ toYaml (fromJson .plugin) | nindent 4 }} 
+        {{ toYaml (fromJson .sourceRendererConf) | nindent 4 }} 
 
-        
       destination:
         server: '{{ .url }}'
-
         # USECASE - TEXT FORMATTING
         namespace: {{ trunc 63 (.namespace | replace "/" "-" | lower) }}
 
