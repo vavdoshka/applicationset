@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: dynamic-template
+  name: dynamic-template-git-file
 spec:
   generators:
     - git:
@@ -11,16 +11,16 @@ spec:
         - path: "examples/untyped-template/git-file/apps/*.yaml"
   fullyUntypedTemplate: |
     metadata:
-      name: '{{ .cluster }}-guestbook' # decide how to structure this, with guestbook or how
+      name: '{{ .cluster }}-git-file-guestbook' # decide how to structure this, with guestbook or how
     spec:
 
       # USECASE - DEFAULT VALUE
       project: '{{ default "default" .project }}'
 
       source:
-        repoURL: https://github.com/argoproj/applicationset.git
+        repoURL: https://github.com/vavdoshka/applicationset.git
         targetRevision: HEAD
-        path: examples/untypedTemplate
+        path: examples/untyped-template/git-file/apps
 
         # USECASE - NON_PRIMITIVE TEMPLATING (https://github.com/argoproj/applicationset/issues/168#issue-840093112)
         {{ toYaml (fromJson .plugin) | nindent 4 }} 
