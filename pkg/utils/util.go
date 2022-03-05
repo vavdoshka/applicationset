@@ -89,7 +89,7 @@ func (r *Render) RenderTemplateParams(tmpl *argov1alpha1.Application, syncPolicy
 			return nil, err
 		}
 
-		err = yaml.Unmarshal([]byte(replacedTmplStr), &replacedTmpl)
+		err = yaml.UnmarshalStrict([]byte(replacedTmplStr), &replacedTmpl)
 		if err != nil {
 			return nil, err
 		}

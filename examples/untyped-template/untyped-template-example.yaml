@@ -12,16 +12,22 @@ spec:
         autosyncSelfHeal: "true"
         namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
         plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
+        test: "'some-value'\n    chart: 'some-other-chart'"
+        revisionHistoryLimit: "0"
       - cluster: engineering-prod
         url: https://kubernetes.default.svc
         autosyncEnabled: "false"
         project: default
         namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
         plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
+        test: "'some-value'\n    chart: 'some-other-chart'"
+        revisionHistoryLimit: "0"
   fullyUntypedTemplate: |
     metadata:
       name: '{{ .cluster }}-guestbook' # decide how to structure this, with guestbook or how
     spec:
+
+      revisionHistoryLimit: {{ atoi .revisionHistoryLimit }}
 
       # USECASE - DEFAULT VALUE
       project: '{{ default "default" .project }}'
@@ -29,7 +35,10 @@ spec:
       source:
         repoURL: https://github.com/argoproj/applicationset.git
         targetRevision: HEAD
-        path: examples/untypedTemplate
+        # this does allow to create some arbitarary segment
+        # with quotes '{ .test }' it is becomming an invalid data all wrapped with redundant quotes
+
+        path: {{ .test }}
 
         # USECASE - NON_PRIMITIVE TEMPLATING (https://github.com/argoproj/applicationset/issues/168#issue-840093112)
         {{ toYaml (fromJson .plugin) | nindent 4 }} 

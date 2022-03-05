@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: dynamic-template-cluster
+spec:
+  generators:
+  - clusters:
+      selector:
+        matchLabels:
+          not-in-cluster: "true"
+  fullyUntypedTemplate: |
+    metadata:
+      name: '{{ .name }}-cluster-guestbook' # decide how to structure this, with guestbook or how
+      annotations:
+      {{ range $key, $val := . }}
+        {{ if and (hasPrefix "metadata.annotations." $key ) (not (hasSuffix "last-applied-configuration" $key) ) }}
+        {{ $key | replace "metadata.annotations." "" }}: {{ $val }}
+        {{ end }}
+      {{ end }}
+    spec:
+
+      # USECASE - DEFAULT VALUE
+      project: '{{ default "default" .project }}'
+
+      source:
+        repoURL: https://github.com/vavdoshka/applicationset.git
+        targetRevision: HEAD
+        path: examples/untyped-template/git-file/apps
+       
+      destination:
+        server: '{{ .server }}'
+        namespace: "{{ index . "metadata.labels.environment" }}"
+
+      # USECASE - CONTROLLING SYNC POLICY CREATION
+      {{ if (eq ( index . "metadata.labels.environment") "dev" ) }}
+      syncPolicy:
+        automated:
+          selfHeal: true
+      {{ end }}

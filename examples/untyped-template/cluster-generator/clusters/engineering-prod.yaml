@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  config: eyJ0bHNDbGllbnRDb25maWciOnsiaW5zZWN1cmUiOmZhbHNlfX0=
+  name: ZW5naW5lZXJpbmctcHJvZA==
+  server: aHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3Zj
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+    environment: prod
+    not-in-cluster: "true"
+  name: cluster-engineering-prod
+  namespace: argocd
+type: Opaque

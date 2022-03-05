@@ -12,10 +12,16 @@ spec:
   fullyUntypedTemplate: |
     metadata:
       name: '{{ .cluster }}-git-file-guestbook' # decide how to structure this, with guestbook or how
+      annotations:
+      {{ range $key, $val := . }}
+        {{ if (hasPrefix "appAnnotations." $key ) }}
+        {{ $key | replace "appAnnotations." "" }}: {{ $val }}
+        {{ end }}
+      {{ end }}
     spec:
 
       # USECASE - DEFAULT VALUE
-      project: '{{ default "default" .project }}'
+      project: {{ default "default" .project }}
 
       source:
         repoURL: https://github.com/vavdoshka/applicationset.git
@@ -29,7 +35,7 @@ spec:
       destination:
         server: '{{ .url }}'
 
-        # USECASE - TEXT FORMATTING
+        # USECASE - TEXT FORMATTING issues #447,#351,#518
         namespace: {{ trunc 63 (.namespace | replace "/" "-" | lower) }}
 
       # USECASE - CONTROLLING SYNC POLICY CREATION

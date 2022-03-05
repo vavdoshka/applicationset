@@ -4,3 +4,5 @@ autosyncEnabled: "false"
 project: default
 namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
 plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
+appAnnotations:
+  annotation2: value2

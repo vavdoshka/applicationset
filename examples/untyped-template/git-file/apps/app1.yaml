@@ -4,3 +4,5 @@ autosyncEnabled: "true"
 autosyncSelfHeal: "true"
 namespace: some//////really///loooooooooooooooooooooooooooooooong//namespace-name # len == 70
 plugin: "{\"plugin\": {\"name\": \"kustomized-helm\"} }"
+appAnnotations:
+  annotation1: value1
